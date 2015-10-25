@@ -19,6 +19,9 @@ nut_h = 5;
 extension_h = 13;
 extension_r = 11/2;
 
+// "speck" to keep object centered for slic3r infill pattern
+speck_size = 0.3;
+
 if(shaft_h <= screw_h + handle_base_h + 2) {
     error("Screw won't fit");
 }
@@ -43,7 +46,12 @@ module shape(n=6, r=handle_r, roundness_r=base_roundness_r) {
                     rotate((i+1)*360/n)
                         translate([r,0,0])
                         cylinder(dome_r, r=base_roundness_r, $fn=40);
-                        cylinder(dome_r, r=base_roundness_r);
+                    cylinder(dome_r, r=base_roundness_r);
+                }
+                if(n % 2 != 0) {
+                    rotate((i+0.5)*360/n)
+                        translate([r + base_roundness_r - speck_size,0,0])
+                        cylinder(speck_size, r=speck_size, $fn=12);
                 }
             }
         }
@@ -90,4 +98,4 @@ module handle(n=6) {
     }
 }
 
-handle(0);
+handle(5);
