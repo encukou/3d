@@ -88,6 +88,13 @@ module hole() {
             translate([0, 0, nut_pos]) _nut();
             translate([handle_r, 0, nut_pos]) _nut();
         }
+
+        hull() {
+            translate([0, -screw_r, nut_pos + nut_h])
+                cube([nut_h/1000, screw_r*2, nut_r]);
+            translate([screw_r, -screw_r, nut_pos + nut_h-1])
+                cube([1, screw_r*2, 1]);
+        }
     }
 }
 
