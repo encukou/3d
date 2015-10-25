@@ -11,13 +11,13 @@ shaft_h = 40;
 centerhole_r = 4;
 
 screw_h = 32;
-screw_r = 4.6 / 2;
+screw_r = 5 / 2;
 
 nut_r = 8/2;
 nut_h = 5;
 
-extension_h = 13;
-extension_r = 11/2;
+extension_h = 11;
+extension_r = 12/2;
 
 // "speck" to keep object centered for slic3r infill pattern
 speck_size = 0.3;
