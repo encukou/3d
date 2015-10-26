@@ -37,17 +37,16 @@ module shape(n=6, r=handle_r, roundness_r=base_roundness_r) {
         cylinder(dome_r, r=handle_r, $fn=200);
     }else{
         union() {
-            for(i=[0:n]) {
-                echo(i);
-                hull() {
+            // main shape
+            hull() {
+                for(i=[0:n]) {
                     rotate(i*360/n)
                         translate([r,0,0])
-                        cylinder(dome_r, r=base_roundness_r, $fn=40);
-                    rotate((i+1)*360/n)
-                        translate([r,0,0])
-                        cylinder(dome_r, r=base_roundness_r, $fn=40);
-                    cylinder(dome_r, r=base_roundness_r);
+                            cylinder(dome_r, r=base_roundness_r, $fn=40);
                 }
+            }
+            // specks
+            for(i=[0:n]) {
                 if(n % 2 != 0) {
                     rotate((i+0.5)*360/n)
                         translate([r + base_roundness_r - speck_size,0,0])
