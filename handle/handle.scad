@@ -44,7 +44,6 @@ module shape(n=6, r=handle_r, roundness_r=base_roundness_r) {
                         translate([r,0,0])
                             cylinder(dome_r, r=base_roundness_r, $fn=40);
                 }
-                cylinder(dome_r, r=base_roundness_r);
             }
             // specks
             for(i=[0:n]) {
