@@ -67,16 +67,14 @@ module handle_shape(n=6) {
         }
 
         rotate([0,0,360/6/2])
-            linear_extrude(height=shaft_h)
-            circle(shaft_r, $fn=shaft_sides);
+            cylinder(r=shaft_r, h=shaft_h, $fn=shaft_sides);
 
         cylinder(shaft_h + extension_h, r=extension_r);
     }
 }
 
 module _nut() {
-    linear_extrude(height=nut_h)
-        circle(nut_r, $fn=6);
+    cylinder(r=nut_r, h=nut_h, $fn=6);
 }
 
 module hole() {
