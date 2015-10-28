@@ -4,20 +4,20 @@ base_roundness_r = 3;
 
 dome_r = 70;
 
-shaft_r = 8;
+shaft_r_inner = 8;
 shaft_sides = 6;
 shaft_h = 40;
 
 centerhole_r = 4;
 
 screw_h = 32;
-screw_r = 5 / 2;
+screw_r = 7 / 2;
 
-nut_r = 8/2;
+nut_r_inner = 8.5/2;
 nut_h = 5;
 
 extension_h = 11;
-extension_r = 12/2;
+extension_r = 6;
 
 // "speck" to keep object centered for slic3r infill pattern
 speck_size = 0.3;
@@ -27,6 +27,9 @@ if(shaft_h <= screw_h + handle_base_h + 2) {
 }
 
 //
+
+nut_r = nut_r_inner / sqrt(3) * 2;
+shaft_r = shaft_r_inner / sqrt(3) * 2;
 
 dome_center_depth = sqrt(dome_r * dome_r - handle_r * handle_r);
 
@@ -79,19 +82,23 @@ module _nut() {
 module hole() {
     union() {
         translate([0, 0, handle_base_h - 1])
-            cylinder(shaft_h + extension_h, r=screw_r, $fn=20);
+            cylinder(shaft_h + extension_h, r=screw_r, $fn=10);
 
+        translate([0, 0, nut_pos]) _nut();
         hull() {
-            translate([0, 0, nut_pos]) _nut();
-            translate([handle_r, 0, nut_pos]) _nut();
+            translate([-nut_r/2, -nut_r_inner, nut_pos+nut_h])
+                cube([nut_r/2+screw_r, nut_r_inner*2, 0.01]);
+            translate([0, 0, nut_pos+nut_h])
+                cylinder(nut_h, r=screw_r, $fn=10);
+            intersection() {
+                translate([0, 0, nut_pos+nut_h/2]) _nut();
+                translate([-screw_r, -nut_r_inner, nut_pos+nut_h])
+                    cube([screw_r, nut_r_inner*2, 0.01]);
+            }
         }
 
-        hull() {
-            translate([0, -screw_r, nut_pos + nut_h])
-                cube([nut_h/1000, screw_r*2, nut_r]);
-            translate([screw_r, -screw_r, nut_pos + nut_h-1])
-                cube([1, screw_r*2, 1]);
-        }
+        translate([0, -nut_r_inner, nut_pos])
+            cube([shaft_r_inner+1, nut_r_inner*2, nut_h]);
     }
 }
 
