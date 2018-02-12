@@ -1,0 +1,5 @@
+Podlozka PEI:
+- ABS - 110°
+- PLA - 60°
+- nic na to nepatlat
+- sundavat až to vystydne
