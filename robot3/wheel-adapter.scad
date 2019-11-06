@@ -10,47 +10,99 @@ RIM_R = 11/2;
 RIM_DEPTH = 2;
 WHEEL_THICK = 17;
 
+EPS = 0.001;
 TOL = 0.5;
+TOL2 = 1;
 
-SHAFT_R = 5/2;
-SHAFT_W = 3.5;
+SHAFT_R = 6/2;
+SHAFT_W = 4;
 SHAFT_LEN = 8;
 SHAFT_SCREW_R = 2/2;
 SHAFT_SCREW_B = 1;
 
 MAIN_SCREW_R = 4/2;
 
+THRU_SCREW_SIZE = 20;
+THRU_SCREW_PEN = 3;
+
+CAP_SIZE = THRU_SCREW_SIZE+SHAFT_LEN-THRU_SCREW_PEN-BODY_SIZE-WHEEL_THICK;
+CAP_PROT = 10;
+
 difference () {
     union () {
         difference () {
             union () {
+                // tapered bottom part
                 cylinder (
                     BODY_SIZE,
-                    r1=GROOVE_R_OUT-BODY_SIZE,    // maintain 45° overhang
+                    r1=GROOVE_R_OUT-BODY_SIZE*2/3,    // maintain 45° overhang
                     r2=GROOVE_R_OUT-TOL,
-                    $fn=50);
+                    $fn=100);
+                // upper outer rim
                 translate ([0, 0, BODY_SIZE]) {
-                    cylinder (GROOVE_DEPTH, r=GROOVE_R_OUT-TOL, $fn=50);
+                    cylinder (GROOVE_DEPTH, r=GROOVE_R_OUT-TOL, $fn=100);
                 }
             }
             translate ([0, 0, BODY_SIZE]) {
-                cylinder (100, r=GROOVE_R_IN+TOL, $fn=50);
-                translate ([0, 0, -RIM_DEPTH]) cylinder (100, r=RIM_R+TOL, $fn=50);
+                // main cutout (inside outer rim)
+                cylinder (100, r=GROOVE_R_IN+TOL, $fn=100);
+                // further cutout
+                translate ([0, 0, -RIM_DEPTH]) cylinder (100, r=RIM_R+TOL, $fn=100);
+                // stud hole
                 translate ([0, -GROOVE_STUD_D/2, GROOVE_STUD_CLEARANCE]) {
                     cube ([100, GROOVE_STUD_D, 100]);
                 }
             }
         }
-        cylinder (WHEEL_THICK+BODY_SIZE, r=AXLE_R-TOL, $fn=50);
+        // center column
+        cylinder (WHEEL_THICK+BODY_SIZE-CAP_PROT, r=AXLE_R-TOL/2, $fn=100);
     }
 
-    // Motor shaft
+    // All-the-way-through screw hole
     cylinder (100, r=SHAFT_SCREW_R, $fn=50);
+    // Motor shaft
     translate ([0, 0, -1]) intersection () {
-        cylinder (100, r=SHAFT_R+TOL, $fn=50);
-        translate ([-(SHAFT_W+TOL*2)/2, -50, 0]) cube ([SHAFT_W+TOL*2, 100, SHAFT_LEN+1]);
+        union () {
+            // cylinder
+            cylinder (SHAFT_LEN+EPS, r=SHAFT_R+TOL/2, $fn=50);
+            // taper to prevent overhangs
+            translate ([0, 0, SHAFT_LEN]) cylinder (SHAFT_R, r1=SHAFT_R+TOL, r2=0, $fn=50);
+        }
+        // cross-cube
+        translate ([-(SHAFT_W+TOL*2)/2, -50, 0]) cube ([SHAFT_W+TOL2, 100, 100]);
     }
 
     // Screw
     translate ([0, 0, SHAFT_LEN+SHAFT_SCREW_B]) cylinder (100, r=MAIN_SCREW_R, $fn=50);
+}
+
+module cap () {
+    union () {
+        difference () {
+            cylinder (CAP_SIZE+EPS, r1=GROOVE_R_OUT-TOL-CAP_SIZE*2/3, r2=GROOVE_R_OUT-TOL, $fn=100);
+            translate ([0, 0, -50]) cylinder (100, r=SHAFT_SCREW_R+TOL/2, $fn=50);
+            translate ([0, 0, CAP_SIZE-RIM_DEPTH]) cylinder (100, r=RIM_R+TOL, $fn=100);
+        }
+        difference () {
+            cylinder (CAP_SIZE+CAP_PROT, r=AXLE_R-TOL, $fn=100);
+            translate ([0, 0, -50]) cylinder (100, r=MAIN_SCREW_R, $fn=100);
+        }
+        translate ([0, 0, CAP_SIZE]) difference () {
+            cylinder (GROOVE_DEPTH, r=GROOVE_R_OUT-TOL, $fn=100);
+            translate ([0, 0, -50]) cylinder (100, r=GROOVE_R_IN+TOL, $fn=100);
+            translate ([0, 0, GROOVE_STUD_CLEARANCE]) cube ([100, GROOVE_STUD_D, 100]);
+        }
+    }
+}
+
+%translate ([0, 0, WHEEL_THICK+BODY_SIZE+CAP_SIZE]) scale ([1, 1, -1]) {
+    cap();
+}
+
+%translate ([0, 0, SHAFT_LEN-THRU_SCREW_PEN]) color ([0, 0, 0]) {
+    cylinder (THRU_SCREW_SIZE, r=SHAFT_SCREW_R, $fn=50);
+}
+
+translate ([GROOVE_R_OUT*2, 0, 0]) {
+    cap();
 }
