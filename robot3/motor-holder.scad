@@ -1,10 +1,3 @@
-/* TODO:
-   - mirrorFLAP_* placement (at back of motor)
-   - Push motor screw holes a bit toward front of motor
-   - Larger nut holes (in 1st layer)
-   - Wider through screw holer
-*/
-
 MOTOR_OUT = 16;
 MOTOR_H = 22.4+1;
 MOTOR_W = 18;
@@ -13,7 +6,7 @@ SHAFT_R = 3.49;
 PIN_POS = 22.35;
 PIN_R = 3.68/2;
 PIN_L = 2;
-SCREW_POS = 31.17;
+SCREW_POS = 31.2;
 SCREW_R = 2.64/2;
 SCREW_SEP = 17.42;
 WALL_W = 4;
@@ -21,8 +14,8 @@ THIN_WALL = 2;
 FLAP_W = 3;
 FLAP_L = 6;
 FLAP_S = 7;
-NUT_R = 3;
-NUT_H = 2;
+NUT_R = 3.1;
+NUT_H = 2.1;
 
 VERTICAL_SCREW_OUT = 17;
 CENTER_HOLE_R = 15/2;
@@ -80,8 +73,8 @@ module holder_third () union () {
 
                 translate ([SHAFT_POS+SHAFT_R+TOL, 0, 0]) cube ([WALL_W, WALL_W, MOTOR_H]);
                 translate ([SCREW_POS+SCREW_R+TOL, WALL_W, 0]) cylinder (MOTOR_H, r=WALL_W);
-                next () translate ([-WALL_W, 0, 0]) cylinder (MOTOR_H, r=WALL_W);
                 next () translate ([-WALL_W, -(MOTOR_W/2+FLAP_W/2+TOL+WALL_W), 0]) cylinder (MOTOR_H, r=WALL_W);
+                next () translate ([-WALL_W/2, -(MOTOR_W/2+FLAP_W/2+TOL+WALL_W*3/2), 0]) box ([WALL_W, WALL_W, MOTOR_H], [1, 1, 0]);
             }
             translate ([0, WALL_W*3/2, 0]) difference () {
                 R = SHAFT_POS - SHAFT_R - TOL - WALL_W/2;
@@ -107,14 +100,14 @@ module holder_third () union () {
                 }
             }
             // Flap
-            next () translate ([0, -MOTOR_W/2, MOTOR_H/2-FLAP_S/2]) {
-                box ([FLAP_L*2+TOL, FLAP_W+TOL, 100+TOL], [1, 1, 0]);
+            next () translate ([0, -MOTOR_W/2+TOL, MOTOR_H/2-FLAP_S/2]) {
+                box ([FLAP_L*2+TOL, FLAP_W+TOL, 100+TOL], [1, 2, 0]);
             }
         }
         // Vertical screw hole
         EXTRA_ANGLE = 0; // HACK: chosen by hand
         rotate ([0, 0, -360/3+EXTRA_ANGLE]) {
-            translate ([0, VERTICAL_SCREW_OUT, -EPS]) cylinder (100, r=SCREW_R);
+            translate ([0, VERTICAL_SCREW_OUT, -EPS]) cylinder (100, r=SCREW_R+TOL);
         }
     }
 }
@@ -148,19 +141,19 @@ module motor_assembly() {
 }
 
 // Motors
-%sym3 () rotate([0, 0, 90]) {
+*%sym3 () rotate([0, 0, 90]) {
     translate ([-MOTOR_OUT, 0, 13]) 
     rotate ([0, 90, 0]) motor_assembly();
 }
 
 // Tile size ref
-%translate ([0, 0, -2]) %difference () {
+*%translate ([0, 0, -2]) %difference () {
     cylinder (1, r=100);
     translate ([0, 0, -1]) cylinder (3, r=65);
 }
 
 // Octopus board
-%translate ([6.5, 3.5, 0]) rotate([0, 0, 30]) cube ([65, 65, 1], center=true);
+*%translate ([6.5, 3.5, 0]) rotate([0, 0, 30]) cube ([65, 65, 1], center=true);
 
 // Turtle pen
-%cylinder (100, d=15, $fn=50);
+*%cylinder (100, d=15, $fn=50);
