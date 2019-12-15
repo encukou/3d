@@ -44,10 +44,10 @@ union () {
     difference () {
         box ([BODY_W+RIM_W*2+BASE_W*2, BODY_L, RIM_H+R], [1, 0, 0], [0, RIM_L+BASE_L, BASE_H]);
         box ([BODY_W, BODY_L+EPS, 1000], [1, 0, 1]);
-        box ([BODY_W+RIM_W*2, BODY_L+EPS, 1000], [1, 0, 0], [0, RIM_L, 0]);
+        box ([BODY_W+RIM_W*2+TOL*2, BODY_L+EPS, 1000], [1, 0, 0], [0, RIM_L, 0]);
         for (x=[-1,1]) {
             // gaps in the back
-            translate ([x*(BACK_SEP/2+BACK_W/2), 0, 0]) box ([BACK_W+TOL, 1000, 1000], [1, 0, 0], [0, RIM_L, BACK_H]);
+            translate ([x*(BACK_SEP/2+BACK_W/2), 0, 0]) box ([BACK_W+TOL*2, 1000, 1000], [1, 0, 0], [0, RIM_L, BACK_H]);
             // screw holes
             for (y=[SCREW_POS, BODY_L-SCREW_POS]) {
                 translate ([x*(BODY_W/2+RIM_W/2+BASE_W/2), y, -BASE_H-EPS]) {
