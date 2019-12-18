@@ -11,12 +11,13 @@ BACK_H = 3;
 OVERALL_H = 15; // from screw
 SCREW_R = 4/2;
 SCREW_R_HEAD = 8/2;
+SCREW_HEAD_H = 1;
 
 // Calc
 BASE_H = OVERALL_H - RIM_H;
 
 // Mine
-BASE_W = 11;
+BASE_W = 12;
 BASE_L = 8;
 SCREW_POS = 10;
 
@@ -51,8 +52,11 @@ union () {
             // screw holes
             for (y=[SCREW_POS, BODY_L-SCREW_POS]) {
                 translate ([x*(BODY_W/2+RIM_W/2+BASE_W/2), y, -BASE_H-EPS]) {
-                    cylinder (1000, r=SCREW_R, $fn=20);
-                    cylinder (SCREW_R_HEAD-SCREW_R+EPS, r1=SCREW_R_HEAD, r2=SCREW_R, $fn=20);
+                    cylinder (1000, r=SCREW_R+TOL/2, $fn=20);
+                    translate ([0, 0, SCREW_HEAD_H]) {
+                        cylinder (SCREW_R_HEAD-SCREW_R+EPS, r1=SCREW_R_HEAD+TOL, r2=SCREW_R+TOL/2, $fn=20);
+                    }
+                    cylinder (SCREW_HEAD_H+EPS, r=SCREW_R_HEAD+TOL, $fn=20);
                 }
             }
         }
