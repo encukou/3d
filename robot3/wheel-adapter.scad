@@ -80,12 +80,13 @@ module cap () {
     union () {
         difference () {
             cylinder (CAP_SIZE+EPS, r1=GROOVE_R_OUT-TOL-CAP_SIZE*2/3, r2=GROOVE_R_OUT-TOL, $fn=100);
-            translate ([0, 0, -50]) cylinder (100, r=SHAFT_SCREW_R+TOL/2, $fn=50);
+            translate ([0, 0, -50]) cylinder (100, r=2.8, $fn=50);
             translate ([0, 0, CAP_SIZE-RIM_DEPTH]) cylinder (100, r=RIM_R+TOL, $fn=100);
         }
         difference () {
             cylinder (CAP_SIZE+CAP_PROT, r=AXLE_R-TOL, $fn=100);
-            translate ([0, 0, -50]) cylinder (100, r=MAIN_SCREW_R, $fn=100);
+            translate ([0, 0, -50]) cylinder (50+(WHEEL_THICK+BODY_SIZE+CAP_SIZE)-18, r=2.7, $fn=100);
+            translate ([0, 0, -50]) cylinder (500, r=1.5, $fn=100);
         }
         translate ([0, 0, CAP_SIZE]) difference () {
             cylinder (GROOVE_DEPTH, r=GROOVE_R_OUT-TOL, $fn=100);
@@ -96,7 +97,7 @@ module cap () {
 }
 
 base();
-//translate ([GROOVE_R_OUT*2, 0, 0]) cap();
+translate ([GROOVE_R_OUT*2, 0, 0]) cap();
 
 
 %translate ([0, 0, WHEEL_THICK+BODY_SIZE+CAP_SIZE]) scale ([1, 1, -1]) {
