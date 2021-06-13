@@ -6,7 +6,8 @@ MAIN_WIDTH = 23;
 MAIN_HEIGHT = 12;
 
 SHAFT_R = 18/2;
-SHAFT_TOTAL_LEN = 63;
+SHAFT_LEN_FROM_LIP = 63;
+SHAFT_LIP = 5;
 
 BASE_R = 24/2;
 BASE_LENGTH = 8;
@@ -14,21 +15,31 @@ BASE_LENGTH = 8;
 AUX_R = 5;
 
 CORE_A = 8;
+CORE_B = 9;
 CORE_LEN = 25;
 CORE_SCREW_POS = 13;
-CORE_SCREW_DEPTH = 3;
+CORE_SCREW_DEPTH = 2.5;
+BRIDGE_SAG = 0.5;
 
-// M2x12 screws and M2x14 screw:
+// M2x10 screws and M2x14 screw:
 
-SCREW_R = 2.5/2;
-SCREW_LEN = 12;
-SCREW_HEAD_R = 5.5/2; // includes bit of tolerance
-NUT_R = 6.0/2; // includes bit of tolerance
+SCREW_R_A = 2.8/2; // includes bit of tolerance
+SCREW_R_B = 2.5/2; // includes bit of tolerance
+SCREW_LEN_A = 12;
+SCREW_LEN_B = 16;
+SCREW_HEAD_R_A = 5.5/2; // includes bit of tolerance
+SCREW_HEAD_R_B = 4.5/2; // includes bit of tolerance
+NUT_R_A = 6.0/2; // includes bit of tolerance
+NUT_R_B = 5.0/2; // includes bit of tolerance
 NUT_WIDTH = 2;
+
+// Mine
+
+BASE_RING_WIDTH = 5;
 
 // Helper dimensions:
 
-INF = 1000;
+INF = 300;
 EPS = 0.001;
 TOL = 0.1;
 
@@ -39,6 +50,7 @@ $fn=100;
 MAIN_R = MAIN_WIDTH/2;
 MAIN_OFFSET = MAIN_R - SHAFT_R;
 BASE_AUX_R = BASE_R - SHAFT_R;
+SHAFT_LEN_TO_0 = SHAFT_LEN_FROM_LIP - MAIN_WIDTH/2;
 
 module box (sizes, centering=[1, 1, 1], offset=[0, 0, 0]) {
     translate ([
@@ -63,13 +75,13 @@ module torus(outer_r, inner_r) {
   rotate_extrude() translate([inner_r + r, 0, 0]) circle(r);
 }
 
-module screw_hole () {
-    cyl (SCREW_LEN, SCREW_R+TOL);
-    translate ([0, 0, SCREW_LEN/2 - NUT_WIDTH]) {
-        cylinder (INF, r=NUT_R, $fn=6);
+module screw_hole (len_, screw_r, head_r, nut_r, nut_mult=2.4) {
+    cyl (len_, screw_r);
+    translate ([0, 0, len_/2 - NUT_WIDTH]) {
+        cylinder (NUT_WIDTH*nut_mult, r=nut_r, $fn=6);
     }
-    scale ([1, 1, -1]) translate ([0, 0, SCREW_LEN/2 - NUT_WIDTH]) {
-        cylinder (INF, r=SCREW_HEAD_R);
+    scale ([1, 1, -1]) translate ([0, 0, len_/2 - NUT_WIDTH]) {
+        cylinder (INF, r=head_r);
     }
 }
 
@@ -84,17 +96,19 @@ module door_handle (demo=0) difference () {
         for (sc=[1, -1]) scale ([sc, 1, 1]) {
             intersection () {
                 translate ([MAIN_OFFSET, 0, 0]) {
-                    rotate ([-90, 0, 0]) cylinder (SHAFT_TOTAL_LEN, r=MAIN_R);
+                    rotate ([-90, 0, 0]) cylinder (SHAFT_LEN_TO_0, r=MAIN_R);
                 }
                 translate ([EPS, 0, 0]) box ([INF, INF, INF], [2, 1, 1]);
             }
         }
         */
         // Shaft
-        rotate ([-90, 0, 0]) cylinder (SHAFT_TOTAL_LEN, r=SHAFT_R);
+        rotate ([-90, 0, 0]) cylinder (SHAFT_LEN_TO_0+SHAFT_LIP, r=SHAFT_R);
         // Base
-        translate ([0, SHAFT_TOTAL_LEN, 0]) rotate ([90, 0, 0]) difference () {
-            cylinder (BASE_LENGTH+BASE_AUX_R, r=BASE_R);
+        translate ([0, SHAFT_LEN_TO_0, 0]) rotate ([90, 0, 0]) difference () {
+            translate ([0, 0, BASE_RING_WIDTH]) {
+                cylinder (BASE_LENGTH+BASE_AUX_R-BASE_RING_WIDTH, r=BASE_R);
+            }
             translate ([0, 0, BASE_LENGTH+BASE_AUX_R]) rotate_extrude () {
                 translate ([SHAFT_R+BASE_AUX_R, 0, 0]) circle (BASE_AUX_R);
             }
@@ -129,27 +143,83 @@ module door_handle (demo=0) difference () {
         box ([MAIN_LENGTH, MAIN_WIDTH+EPS, MAIN_LENGTH], [2, 1, 1]);
         rotate ([-90, 0, 0]) cyl (INF, SHAFT_R+EPS);
     }
-    translate ([0, SHAFT_TOTAL_LEN, 0]) {
-        screw_pos = [CORE_A/2-CORE_SCREW_DEPTH+SCREW_R, -CORE_SCREW_POS, 0];
+    translate ([0, SHAFT_LEN_TO_0+SHAFT_LIP, 0]) {
+        screw_pos = [CORE_A/2-CORE_SCREW_DEPTH+SCREW_R_B, -CORE_SCREW_POS, 0];
         difference () {
             // Core cutout
-            box ([CORE_A, CORE_LEN*2, CORE_A]);
+            union () {
+                // Main core
+                box ([CORE_A, CORE_LEN*2, CORE_A+BRIDGE_SAG*2]);
+                // Core taper
+                hull () {
+                    translate ([0, CORE_SCREW_POS, 0]) {
+                        box ([CORE_A, CORE_LEN*2, CORE_A+BRIDGE_SAG*2]);
+                    }
+                    translate ([0, CORE_LEN, 0]) {
+                        box ([CORE_B, CORE_LEN*2, CORE_B+BRIDGE_SAG*2]);
+                    }
+                }
+            }
             // Reg mark
-            if (demo) translate (screw_pos) hull () {
-                cyl (1, SCREW_R);
-                translate ([CORE_A, 0, 0]) cyl (1, SCREW_R);
+            if (demo==1) translate (screw_pos) hull () {
+                cyl (1, SCREW_R_B);
+                translate ([CORE_A, 0, 0]) cyl (1, SCREW_R_B);
             }
         }
         // Core screw
-        if (!demo) translate (screw_pos) screw_hole();
+        if (demo!=1) translate (screw_pos) screw_hole(
+            SCREW_LEN_B,
+            SCREW_R_B,
+            SCREW_HEAD_R_B,
+            NUT_R_B
+        );
     }
     // Screws
-    screw_hole();
-    translate ([MAIN_LENGTH-MAIN_WIDTH+MAIN_OFFSET, 0, 0]) screw_hole();
+    screw_hole(
+        SCREW_LEN_A,
+        SCREW_R_A,
+        SCREW_HEAD_R_A,
+        NUT_R_A
+    );
+    translate ([MAIN_LENGTH-MAIN_WIDTH+MAIN_OFFSET, 0, 0]) screw_hole(
+        SCREW_LEN_A,
+        SCREW_R_A,
+        SCREW_HEAD_R_A,
+        NUT_R_A
+    );
+    translate ([(MAIN_LENGTH-MAIN_WIDTH+MAIN_OFFSET)/2, 0, 0]) screw_hole(
+        SCREW_LEN_A,
+        SCREW_R_A,
+        SCREW_HEAD_R_A,
+        NUT_R_A
+    );
+    translate ([0, SHAFT_LEN_TO_0-CORE_LEN, 0]) screw_hole(
+        SCREW_LEN_A,
+        SCREW_R_A,
+        SCREW_HEAD_R_A,
+        NUT_R_A,
+        10
+    );
+
+    /* Screw position demo
+    if (demo == 2) difference () {
+        box ([200, 200, 50]);
+        cyl (200, r=5);
+        translate ([MAIN_LENGTH-MAIN_WIDTH+MAIN_OFFSET, 0, 0]) cyl (200, r=5);
+        translate ([0, SHAFT_LEN_TO_0-CORE_SCREW_POS-5, 0]) box ([50, 50, 50], [1, 0, 1]);
+    }
+    //*/
+}
+
+module base_ring () {
+    difference () {
+        cylinder (BASE_RING_WIDTH, r=BASE_R);
+        translate ([0, 0, -1]) cylinder (BASE_RING_WIDTH+2, r=SHAFT_R+TOL*2);
+    }
 }
 
 scale ([1, 1, -1]) {
-    //* Demo
+    /* Demo
     translate ([30, 30, 0]) intersection () {
         door_handle (demo=1);
         box ([INF, INF, 0.4]);
@@ -159,14 +229,26 @@ scale ([1, 1, -1]) {
 
     /*/
     // Door handle halves
+    //intersection () {
+      //  union(){box ([15, 400, 12.5], [1, 1, 1]);
+        //    translate ([0, -65, 0]) box ([15, 400, 25], [1, 2, 1]);
+        //};union(){
     intersection () {
         door_handle ();
         box ([INF, INF, INF], [1, 1, 2]);
     }
 
     translate ([0, -MAIN_WIDTH*6/5, 0]) rotate ([180, 0, 0]) intersection () {
-        door_handle ();
+        door_handle (demo=2);
         box ([INF, INF, INF], [1, 1, 0]);
     }
     //*/
+
+    /*intersection (demo=2) {
+        door_handle (demo=1);
+        box ([INF, INF, 0.4]);
+    }*/
 }
+    //}}
+
+translate ([-20, -15, 0]) base_ring ();
