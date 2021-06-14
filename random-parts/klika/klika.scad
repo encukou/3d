@@ -21,7 +21,7 @@ CORE_SCREW_POS = 13;
 CORE_SCREW_DEPTH = 2.5;
 BRIDGE_SAG = 0.5;
 
-// M2x10 screws and M2x14 screw:
+// M2.5×10 screws and M2×14 screw:
 
 SCREW_R_A = 2.8/2; // includes bit of tolerance
 SCREW_R_B = 2.5/2; // includes bit of tolerance
@@ -92,16 +92,6 @@ module door_handle (demo=0) difference () {
             sphere (r=MAIN_R);
             translate ([MAIN_LENGTH - MAIN_WIDTH, 0, 0]) sphere (r=MAIN_R);
         }
-        /* weird shaft
-        for (sc=[1, -1]) scale ([sc, 1, 1]) {
-            intersection () {
-                translate ([MAIN_OFFSET, 0, 0]) {
-                    rotate ([-90, 0, 0]) cylinder (SHAFT_LEN_TO_0, r=MAIN_R);
-                }
-                translate ([EPS, 0, 0]) box ([INF, INF, INF], [2, 1, 1]);
-            }
-        }
-        */
         // Shaft
         rotate ([-90, 0, 0]) cylinder (SHAFT_LEN_TO_0+SHAFT_LIP, r=SHAFT_R);
         // Base
@@ -200,15 +190,6 @@ module door_handle (demo=0) difference () {
         NUT_R_A,
         10
     );
-
-    /* Screw position demo
-    if (demo == 2) difference () {
-        box ([200, 200, 50]);
-        cyl (200, r=5);
-        translate ([MAIN_LENGTH-MAIN_WIDTH+MAIN_OFFSET, 0, 0]) cyl (200, r=5);
-        translate ([0, SHAFT_LEN_TO_0-CORE_SCREW_POS-5, 0]) box ([50, 50, 50], [1, 0, 1]);
-    }
-    //*/
 }
 
 module base_ring () {
@@ -225,14 +206,8 @@ scale ([1, 1, -1]) {
         box ([INF, INF, 0.4]);
     }
 
-    //door_handle ();
-
     /*/
     // Door handle halves
-    //intersection () {
-      //  union(){box ([15, 400, 12.5], [1, 1, 1]);
-        //    translate ([0, -65, 0]) box ([15, 400, 25], [1, 2, 1]);
-        //};union(){
     intersection () {
         door_handle ();
         box ([INF, INF, INF], [1, 1, 2]);
@@ -243,12 +218,6 @@ scale ([1, 1, -1]) {
         box ([INF, INF, INF], [1, 1, 0]);
     }
     //*/
-
-    /*intersection (demo=2) {
-        door_handle (demo=1);
-        box ([INF, INF, 0.4]);
-    }*/
 }
-    //}}
 
 translate ([-20, -15, 0]) base_ring ();
