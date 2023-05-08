@@ -23,9 +23,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.4378367"
-     inkscape:cx="277.84796"
-     inkscape:cy="1056.1005"
+     inkscape:zoom="2.8756734"
+     inkscape:cx="231.7718"
+     inkscape:cy="834.761"
      inkscape:window-width="1920"
      inkscape:window-height="985"
      inkscape:window-x="0"
@@ -51,21 +51,22 @@
      id="layer1">
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 113.38583,1046.9291 H 340.15748 L 453.5433,1004.9604 C 453.54329,921.81082 264.56692,846.22026 226.77164,747.95255 188.97637,846.22026 -1.2581321e-5,921.81081 4.1867861e-7,1004.9604 Z"
+       d="M 113.38583,1046.9291 H 340.15748 L 453.5433,1004.9604 C 453.54329,921.81082 226.77166,857.95276 226.77166,752.12599 226.77166,857.95276 -1.2581321e-5,921.81081 4.1867861e-7,1004.9604 Z"
        id="tri"
        sodipodi:nodetypes="cccccc" />
     <circle
        style="fill:none;stroke:#000000;stroke-opacity:0.974543"
        id="circ1"
        cx="226.77165"
-       cy="778.18872"
+       cy="782.36218"
        r="22.677166" />
-    <circle
+    <ellipse
        style="fill:none;stroke:#000000;stroke-opacity:0.974543"
        id="circ2"
+       cy="782.36218"
        cx="226.77165"
-       cy="778.18872"
-       r="30.236219" />
+       rx="34.015743"
+       ry="34.015717" />
     <rect
        style="fill:none;stroke:#000000;stroke-opacity:0.974543"
        id="leg1"
